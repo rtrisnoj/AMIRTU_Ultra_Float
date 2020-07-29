@@ -251,10 +251,14 @@ void RTCZero::setDate(uint8_t day, uint8_t month, uint8_t year)
   }
 }
 
-
+int temp100 = 0;
 uint32_t RTCZero::getEpoch()
 {
-	//begin();
+	if (temp100 == 0) {
+		begin();
+		temp100 = 1;
+	}
+	//
 	uint32_t register_value = rtc_get_time();
 	struct rtc_clockreg_value time;
 	rtc_register_value_to_time(register_value, &time);

@@ -235,7 +235,7 @@ sapi_error_t temp_build_payload(char *buf, float *reading)
 	strcat(payload, unit_buf);
 
 	strcpy(buf, payload);
-
+	
 	dlog(LOG_DEBUG, "Temp Payload: %s", payload);
 	return SAPI_ERR_OK;
 }
