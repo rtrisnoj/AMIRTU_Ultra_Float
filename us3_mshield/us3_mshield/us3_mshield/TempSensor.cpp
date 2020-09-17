@@ -152,10 +152,115 @@ sapi_error_t temp_write_cfg(char *payload, uint8_t *len)
 
 //////////////////////////////////////////////////////////////////////////
 //
-// Measure Ultrasonic data and Float
-// Created 04/24/2020
+// Measure Ultrasonic data (RS485) and Float
+// Created 09/11/2020
 // By Ryan Trisnojoyo
+// PINS LAYOUT
+// D2 = RX						RO
+// D3 = TX						DI
+// D4 = DIGITAL OUTPUT			RE
+// D5 = DIGITAL OUTPUT			DE
+// Ultrasonic sensor : 
+// RS485_TX = B		--->		A RS485 Ultrasonic Sensor	
+// RS485_RX = A		--->		B RS485 Ultrasonic Sensor
+// Relay NO			--->		VIN Ultrasonic Sensor
+// Relay COM		--->		V+ Battery 12V
+// GND				--->		GND Ultrasnonic Sensor
+// Float sensor:
+// D10				--->		Signal Float pin
+// GND				--->		GND pin
 //////////////////////////////////////////////////////////////////////////
+float resultTemp = 0;
+float resultUltra = 0;
+
+byte temp_data[12];
+byte sendRS485Request[6]={0xAA,0x01,0x03,0x00,0x00,0xAE}; //Send Request for STATUS Command
+size_t bytes;
+
+float Send(byte * cmd, byte* ret) {
+	// use default send function
+	//turn on relay
+	digitalWrite(D6, HIGH);
+	digitalWrite(D7, LOW);
+	delay(5000);
+	sendCommand(cmd);
+	
+	 // receive answer
+  if (Serial3.available()){  //Read return data package (NOTE: Demo is just for your reference, the data package haven't be calibrated yet)
+	while(Serial3.read() != 0x01);
+	ret[0] = 0x01;
+	for(int j=2; j < 12; j++){
+		ret[j++]=(Serial3.read());
+	}
+	
+    Serial.println("Data Begin");
+    Serial.println(ret[0],HEX); //byte 1    //Sensor ID Tag
+    Serial.println(ret[2],HEX); //byte 2    //Response Code
+    Serial.println(ret[4],HEX); //byte 3    //Range LSB
+    Serial.println(ret[6],HEX); //byte 4    //Range MSB
+    Serial.println(ret[8],HEX); //byte 5    //Temperature Data
+    Serial.println(ret[10],HEX); //byte 6   //Checksum mod 256
+    Serial.println("Data End");
+
+    Serial3.flush();
+    Serial.println("Received data Done");
+
+    resultTemp = (float(ret[8])*0.48876)-50;
+    Serial.print("Temperature: ");
+    Serial.print(resultTemp);
+    Serial.println(" C");
+
+    resultUltra = (float(ret[6]*256)+float(ret[4]))/128;
+    Serial.print("Level: ");
+    Serial.print(resultUltra);
+    Serial.println(" In");
+
+  }
+  else{
+    Serial.println("Error reading RS485");
+  }
+    delay(1000);
+	//turn off relay
+	digitalWrite(D6, LOW);
+	digitalWrite(D7, HIGH);
+	
+	return resultUltra;
+}
+
+/*sendCommand(...)******************************************************************************
+ * General function that sends command to RS485 peripheral device
+ * <CR> is added to all commands
+ * For RS485 communication, RTS pin has to be HIGH to allow writing to peripheral
+ **********************************************************************************************/
+void sendCommand(byte *cmd) {
+
+//check if transmit the correct data
+/*
+ Serial.println("Send Command");
+ for(int i=0; i < 6; i++){
+    Serial.print(cmd[i]);
+    Serial.println("");
+ }
+ */
+	// set RTS to HIGH to allow writing to MAX485
+ 	digitalWrite(D4, HIGH);
+ 	digitalWrite(D5, HIGH); 
+	delay(100);
+
+	for(int i=0; i < 6; i++){
+		Serial3.write(cmd[i]); 
+  //Serial.print(cmd[i]);
+	}	
+ // send command
+	Serial3.flush(); // Make sure message is fully transferred
+	// set RTS to LOW to receive answer
+	digitalWrite(D4, LOW);
+	digitalWrite(D5, LOW);
+ 
+	delay(50);
+}
+ 
+ /*
 float ultra_temp = 12.00;
 float calculate_Ultra(){
 	 //turn on relay
@@ -170,6 +275,9 @@ float calculate_Ultra(){
 	 digitalWrite(D7, HIGH);
 	 return ultra_temp;
  }
+ */
+ 
+ //Float Code
  int temp_float = 0;
  int calculate_Float(){
 	 pinMode(D10, INPUT_PULLUP);
@@ -205,13 +313,18 @@ sapi_error_t temp_build_payload(char *buf, float *reading)
 	char		unitUltra[] = "In";
 	char		unitFloat[] = "Al";
 	char		unit_buf[4];
+	float		ultra_temp = 10.00;
 	time_t     	epoch;
 	uint32_t	indx;
 	char    rultra1[] = "12.00,";
 	char    rfloat[] = "2,"; //if it shows 2, float not connected properly. The value should be 0 or 1.
 	char    temp_epoch[20];
+	
 
-	sprintf(rultra1, "%.2f,", calculate_Ultra());
+	Serial3.flush();
+	
+	ultra_temp = Send(sendRS485Request, temp_data);
+	sprintf(rultra1, "%.2f,", ultra_temp);
 	sprintf(rfloat, "%d,", calculate_Float());
 
 	// Create string containing the UNIX epoch

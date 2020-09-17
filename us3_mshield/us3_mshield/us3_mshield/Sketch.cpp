@@ -92,14 +92,19 @@ int sampleRate1 = 0;
 void setup()
 {
 	Serial.begin(115200);
-
+	Serial3.begin(19200);
 	sapi_error_t rcode;
 	// Initialize Sensor API
 	sapi_initialize(NULL);
-	//pinMode(D6, OUTPUT);
-	//pinMode(PIN_SDA,INPUT);
-	//Initialize Variables for the Software
-
+	
+	//Initialize Variables for the Software, Initialize D4 and D5 for RS485
+	pinMode(D4, OUTPUT); //RE
+	pinMode(D5, OUTPUT); //DE
+	pinMode(D6, OUTPUT); //Relay
+	pinMode(D7, OUTPUT); //Relay
+	digitalWrite(D4, LOW);
+	digitalWrite(D5, LOW);
+	
 	pinMode(D10,INPUT_PULLUP);
 	//pinMode(A5,INPUT);
 	//pinMode(D11,OUTPUT);
@@ -121,7 +126,6 @@ void setup()
 
 	// Initialize echo sensor
 	//rcode = sapi_init_sensor(echo_sensor_id);
-
 
 }
 
