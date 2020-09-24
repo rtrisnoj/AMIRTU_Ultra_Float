@@ -178,7 +178,9 @@ TempSensor.d TempSensor.o: .././TempSensor.cpp \
  ../../ArduinoCore/include/libraries/Filters-master/FilterOnePole.h \
  ../../ArduinoCore/include/libraries/Filters-master/FilterTwoPole.h \
  ../../ArduinoCore/include/libraries/Filters-master/FilterDerivative.h \
- ../../ArduinoCore/include/libraries/Filters-master/RunningStatistics.h
+ ../../ArduinoCore/include/libraries/Filters-master/RunningStatistics.h \
+ ..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi.h \
+ ..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi_error.h
 
 ..\\..\ArduinoCore\include/TempSensor.h:
 
@@ -541,3 +543,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 ../../ArduinoCore/include/libraries/Filters-master/FilterDerivative.h:
 
 ../../ArduinoCore/include/libraries/Filters-master/RunningStatistics.h:
+
+..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi.h:
+
+..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi_error.h:

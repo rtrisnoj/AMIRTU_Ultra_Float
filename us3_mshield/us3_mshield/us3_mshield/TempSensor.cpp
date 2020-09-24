@@ -28,7 +28,7 @@ Networks, Inc.
 */
 #include "TempSensor.h"
 #include <Filters.h>
-
+#include "sapi.h"
 
 // DHT11 Sensor Object
 #define DHT_TYPE           DHT11
@@ -37,6 +37,8 @@ DHT_Unified dht(A1, DHT_TYPE);
 // Sensor Context. Contains the unit of measure and alert state.
 static temp_ctx_t context;
 
+int counter1 = 0;
+char 		payloadFinal[128];
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -89,21 +91,26 @@ sapi_error_t temp_init_sensor()
 sapi_error_t temp_read_sensor(char *payload, uint8_t *len)
 {
 	float reading = 0.0;
-    sapi_error_t rc;
+	sapi_error_t rc;
 	char buffer[128];
 
 	// Read temp sensor, already in network order
-    rc = read_dht11(&reading);
+	rc = read_dht11(&reading);
 	if (rc != SAPI_ERR_OK)
 	{
 		return rc;
 	}
-
+	//sendInterval1;
+	//sampleRate1;
 	// Assemble the Payload
 	rc = temp_build_payload(buffer, &reading);
+	if (rc != SAPI_ERR_OK)
+	{
+		return rc;
+	}
 	strcpy(payload, buffer);
 	*len = strlen(buffer);
-    return rc;
+	return rc;
 }
 
 
@@ -172,7 +179,6 @@ sapi_error_t temp_write_cfg(char *payload, uint8_t *len)
 //////////////////////////////////////////////////////////////////////////
 float resultTemp = 0;
 float resultUltra = 0;
-
 byte temp_data[12];
 byte sendRS485Request[6]={0xAA,0x01,0x03,0x00,0x00,0xAE}; //Send Request for STATUS Command
 size_t bytes;
@@ -184,10 +190,13 @@ float Send(byte * cmd, byte* ret) {
 	digitalWrite(D7, LOW);
 	delay(5000);
 	sendCommand(cmd);
-	
+	int h = 0;
 	 // receive answer
-  if (Serial3.available()){  //Read return data package (NOTE: Demo is just for your reference, the data package haven't be calibrated yet)
-	while(Serial3.read() != 0x01);
+    if (Serial3.available()){  //Read return data package (NOTE: Demo is just for your reference, the data package haven't be calibrated yet)
+		while(Serial3.read() != 0x01 && h < 1000){
+		h = h + 1;
+		}
+	h = 0; 
 	ret[0] = 0x01;
 	for(int j=2; j < 12; j++){
 		ret[j++]=(Serial3.read());
@@ -305,9 +314,11 @@ float calculate_Ultra(){
 //////////////////////////////////////////////////////////////////////////
 sapi_error_t temp_build_payload(char *buf, float *reading)
 {
+	int sendInterval2 = ParamSendInterval();
+	int sampleRate2 =  ParamSampleRate();
 	char 		payload[128]; // REMEMBER!! maximum payload 118 character payload character
-	char		reading_buf[32];
 	char		temp_payload[128];
+	char		reading_buf[32];
 	char        datatype_Ultra[] = "3,"; //datatype for LEVEL is 3
 	char		datatype_Float[] = "7,"; //datatype for DI state is 7
 	char		unitUltra[] = "In";
@@ -320,6 +331,8 @@ sapi_error_t temp_build_payload(char *buf, float *reading)
 	char    rfloat[] = "2,"; //if it shows 2, float not connected properly. The value should be 0 or 1.
 	char    temp_epoch[20];
 	
+	strcpy(temp_payload, "");
+	strcpy(payload, "");
 
 	Serial3.flush();
 	
@@ -333,24 +346,42 @@ sapi_error_t temp_build_payload(char *buf, float *reading)
 	
 	
 	//construct ultrasonic data payload
-	sprintf(payload, "%d,", epoch);
-	strcat(payload, datatype_Ultra);
-	strcat(payload, rultra1);
+	sprintf(temp_payload, "%d,", epoch);
+	strcat(temp_payload, datatype_Ultra);
+	strcat(temp_payload, rultra1);
 	strcpy(unit_buf, unitUltra);
-	strcat(payload, unit_buf);
-	strcat(payload, ";");
+	strcat(temp_payload, unit_buf);
+	strcat(temp_payload, ";");
 
 	//construct float data payload
-	strcat(payload,temp_epoch);
-	strcat(payload, datatype_Float);
-	strcat(payload, rfloat);
+	strcat(temp_payload,temp_epoch);
+	strcat(temp_payload, datatype_Float);
+	strcat(temp_payload, rfloat);
 	strcpy(unit_buf, unitFloat);
-	strcat(payload, unit_buf);
-
-	strcpy(buf, payload);
-	
+	strcat(temp_payload, unit_buf);
+	strcat(temp_payload,";");
+	strcpy(payload, temp_payload);
+	/*
 	dlog(LOG_DEBUG, "Temp Payload: %s", payload);
 	return SAPI_ERR_OK;
+	*/
+	
+	if (counter1 >= (sendInterval2 / sampleRate2 - 1) ){
+		strcat(payloadFinal, payload);
+		strcpy(buf, payloadFinal); //copy to final buf and ready to be sent
+		counter1= 0;
+		dlog(LOG_DEBUG, "Temp Payload Final: %s", payloadFinal);
+		//empty the final payload
+		strcpy(payloadFinal, "");
+		return SAPI_ERR_OK;
+	}
+	else {
+		counter1 = counter1 + 1; //+1 counter
+		strcat(payloadFinal, payload);
+		//dlog(LOG_DEBUG, "Temp Payload: %s", payload);
+		return SAPI_ERR_OK;
+	}
+	
 }
 
 
