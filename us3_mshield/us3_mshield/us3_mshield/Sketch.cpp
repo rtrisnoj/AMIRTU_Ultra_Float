@@ -89,6 +89,16 @@ time_t  epoch      = get_rtc_epoch();
 
 int sendInterval1 = 0;
 int sampleRate1 = 0;
+
+volatile uint8_t alert = 0;
+
+
+// ISR function executes when push button at pin D5 is pressed
+void floatTrigger()
+{
+	alert = 1;                //Change Output value to LOW
+	dlog(LOG_DEBUG, "Interrupt Float");
+}
 void setup()
 {
 	Serial.begin(115200);
@@ -126,6 +136,11 @@ void setup()
 
 	// Initialize echo sensor
 	//rcode = sapi_init_sensor(echo_sensor_id);
+	
+	//  function for creating external interrupts at pin2 on Rising (LOW to HIGH)
+	alert = 0;
+	//pinMode(PIN_A4, INPUT_PULLUP);
+	
 
 }
 
@@ -135,6 +150,15 @@ void setup()
 //
 void loop()
 {
+	int reading = digitalRead(D10);
+	attachInterrupt(digitalPinToInterrupt(D10), floatTrigger, RISING);
 	// Call SAPI run to do the heavy lifting
 	sapi_run();
+	
+	if (alert == 1)
+	{
+		dlog(LOG_DEBUG, "Push Notification");
+		sapi_push_notification(temp_sensor_id);
+		alert = 0;
+	}
 }

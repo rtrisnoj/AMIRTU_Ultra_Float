@@ -365,8 +365,8 @@ sapi_error_t temp_build_payload(char *buf, float *reading)
 	dlog(LOG_DEBUG, "Temp Payload: %s", payload);
 	return SAPI_ERR_OK;
 	*/
-	
-	if (counter1 >= (sendInterval2 / sampleRate2 - 1) ){
+
+	if ((counter1 >= (sendInterval2 / sampleRate2 - 1)) || (temp_float == 1) ){
 		strcat(payloadFinal, payload);
 		strcpy(buf, payloadFinal); //copy to final buf and ready to be sent
 		counter1= 0;
