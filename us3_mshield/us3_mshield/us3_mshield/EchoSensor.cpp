@@ -1,24 +1,36 @@
 /*
  * EchoSensor.cpp
- *
- * Created: 6/27/2019 10:57:31 AM
- *  Author: bob
+ * Status Message
+ * Created: 10/08/2020
+ *  Author: Ryan T
  */ 
 
 #include "EchoSensor.h"
+#include "sapi.h"
 
 static char		 echostring[32];
 static uint32_t	 echocount;
 
+int sendInterval3 = ParamSendInterval();
+int sampleRate3 =  ParamSampleRate();
 
 sapi_error_t echo_read_sensor(char *payload, uint8_t *len)
 {
-	char	count[16];
 	// Assemble the Payload
+	char    rsendInterval[] = "0";
+	char    rsampleRate[] = "0,"; //if it shows 2, float not connected properly. The value should be 0 or 1.
 	
-	strcpy(payload, echostring);
-	sprintf(count, " %d", echocount++);
-	strcat(payload, count);
+	sprintf(rsendInterval, "%d,", sendInterval3);
+	sprintf(rsampleRate, "%d,", sampleRate3);
+	
+	strcpy(payload, "");
+	strcat(payload, "SI:");
+	strcat(payload, rsendInterval);
+	strcat(payload, ";");
+	strcat(payload, "SR:");
+	strcat(payload, rsampleRate);
+	strcat(payload, ";");
+
 	*len = strlen(payload);
 	
 	dlog(LOG_DEBUG, "Echo Payload: %s", payload);

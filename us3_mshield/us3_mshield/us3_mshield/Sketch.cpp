@@ -90,6 +90,10 @@ time_t  epoch      = get_rtc_epoch();
 int sendInterval1 = 0;
 int sampleRate1 = 0;
 
+unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
+unsigned long debounceDelay = 2000;    // the debounce time; increase if the output flickers
+int lastState = LOW;
+
 volatile uint8_t alert = 0;
 
 
@@ -130,13 +134,16 @@ void setup()
 	// Initialize temp sensor
 	rcode = sapi_init_sensor(temp_sensor_id);
 
-
-	// Register echo sensor
-	//echo_sensor_id = sapi_register_sensor(ECHO_SENSOR_TYPE, echo_init_sensor, echo_read_sensor, NULL, echo_write_cfg, 1, 60);
+	/*
+	// Register status message , send every 24 hours
+	echo_sensor_id = sapi_register_sensor(ECHO_SENSOR_TYPE, echo_init_sensor, echo_read_sensor, NULL, echo_write_cfg, 1, 86400);
 
 	// Initialize echo sensor
-	//rcode = sapi_init_sensor(echo_sensor_id);
+	rcode = sapi_init_sensor(echo_sensor_id);
 	
+	//Send both data in the beginning
+	sapi_push_notification(echo_sensor_id); //Status Message
+	*/
 	//  function for creating external interrupts at pin2 on Rising (LOW to HIGH)
 	alert = 0;
 	//pinMode(PIN_A4, INPUT_PULLUP);
@@ -155,10 +162,19 @@ void loop()
 	// Call SAPI run to do the heavy lifting
 	sapi_run();
 	
-	if (alert == 1)
-	{
+	if (reading != lastState){
+		lastDebounceTime = millis();
+	}
+	
+	if ((millis() - lastDebounceTime) > debounceDelay) {
+		// whatever the reading is at, it's been there for longer than the debounce
+		// delay, so take it as the actual current state:
+		
+		if (alert == 1)
+		{
 		dlog(LOG_DEBUG, "Push Notification");
 		sapi_push_notification(temp_sensor_id);
 		alert = 0;
+		}
 	}
 }

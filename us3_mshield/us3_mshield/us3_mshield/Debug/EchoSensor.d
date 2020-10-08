@@ -173,7 +173,9 @@ EchoSensor.d EchoSensor.o: .././EchoSensor.cpp \
  ..\\..\ArduinoCore\include\core/arduino.h \
  ..\\..\ArduinoCore\include\libraries\ssni_coap_server/errors.h \
  ..\\..\ArduinoCore\include\libraries\RTCZero/RTCZero.h \
- ..\\..\ArduinoCore\include\libraries\ssni_coap_server/log.h
+ ..\\..\ArduinoCore\include\libraries\ssni_coap_server/log.h \
+ ..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi.h \
+ ..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi_error.h
 
 ..\\..\ArduinoCore\include/EchoSensor.h:
 
@@ -526,3 +528,7 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\arm\arm-gnu-toolchain\arm-no
 ..\\..\ArduinoCore\include\libraries\RTCZero/RTCZero.h:
 
 ..\\..\ArduinoCore\include\libraries\ssni_coap_server/log.h:
+
+..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi.h:
+
+..\\..\ArduinoCore\include\libraries\ssni_coap_server/sapi_error.h:
