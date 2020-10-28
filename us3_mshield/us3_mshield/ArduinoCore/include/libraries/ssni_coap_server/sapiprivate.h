@@ -139,7 +139,7 @@ void sapi_log_banner();
 #define SAPI_VERSION_STRING "Itron SAPI: "
 
 // Payload Max Length
-#define SAPI_MAX_PAYLOAD_LEN		128
+#define SAPI_MAX_PAYLOAD_LEN		256
 #define SAPI_MAX_DEVICE_TYPE_LEN    8
 
 // Max devices that can be registered.

@@ -83,7 +83,7 @@ struct mbuf *pending_rsp;
 uint8_t set_observer_sapi(const char *sensor_type, ObsFuncPtr p, uint32_t frequency, uint8_t sensor_id)
 {
 	// Assemble the full resource URI; e.g. "/arduino/temp". Link to master observe table.
-	sprintf(observe_info[observe_info_index].obs_uri, "/arduino/%s", sensor_type);
+	sprintf(observe_info[observe_info_index].obs_uri, "/us3/%s", sensor_type);
 	
 	observe_info[observe_info_index].pObsFunc = p;
 	observe_info[observe_info_index].frequency = frequency;
@@ -101,7 +101,7 @@ uint8_t set_observer_sapi(const char *sensor_type, ObsFuncPtr p, uint32_t freque
 void set_observer( const char *uri_rsrc_name, ObsFuncPtr p )
 {
 	// Assemble the full resource URI; e.g. "/arduino/temp". Link to master observe table.
-	sprintf(observe_info[observe_info_index].obs_uri, "/arduino/%s", uri_rsrc_name);
+	sprintf(observe_info[observe_info_index].obs_uri, "/us3/%s", uri_rsrc_name);
 	
 	observe_info[observe_info_index].pObsFunc = p;
 	observe_info[observe_info_index].frequency = OBSERVATION_FREQUENCY;

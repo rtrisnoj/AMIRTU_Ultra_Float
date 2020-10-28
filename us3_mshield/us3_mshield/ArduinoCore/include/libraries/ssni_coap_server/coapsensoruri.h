@@ -40,7 +40,7 @@ Networks, Inc.
 
 // Related to URI Path
 #define CLASSIFIER_MAX_LEN			16
-#define DEFAULT_CLASSIFIER			"arduino"
+#define DEFAULT_CLASSIFIER			"us3"
 
 // Longest Uri-Path+Uri-Query we'll handle
 #define MAX_URI_LEN					256

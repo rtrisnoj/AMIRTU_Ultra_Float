@@ -524,7 +524,7 @@ error_t crresourcehandler(struct coap_msg_ctx *req, struct coap_msg_ctx *rsp, vo
 	uint8_t obs = false;
 
 
-    /* No URI path beyond /temp is supported, so reject if present. */
+    /* No URI path beyond /temp is supported, so reject if present. */ //HULALA
     o = copt_get_next_opt_type((const sl_co*)&(req->oh), COAP_OPTION_URI_PATH, &it);
     if (o)
     {

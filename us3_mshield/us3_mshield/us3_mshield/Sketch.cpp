@@ -91,7 +91,7 @@ int sendInterval1 = 0;
 int sampleRate1 = 0;
 
 unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
-unsigned long debounceDelay = 2000;    // the debounce time; increase if the output flickers
+unsigned long debounceDelay = 5000;    // the debounce time; increase if the output flickers
 int lastState = LOW;
 
 volatile uint8_t alert = 0;

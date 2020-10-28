@@ -39,7 +39,8 @@ Networks, Inc.
 
 /*
  * For tracking what's being observed. Allows a mapping between the resource
- * (uri) the token associated with the request, and the client's handle.
+ * (
+ ) the token associated with the request, and the client's handle.
  * NB Only one client is assumed.
  */
 #define MAX_OBS_URI_LEN     MAX_URI_LEN
