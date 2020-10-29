@@ -35,7 +35,7 @@ Networks, Inc.
 #include "hbuf.h"
 
 
-#define MAX_OBSERVE_URI_LENGTH 32
+#define MAX_OBSERVE_URI_LENGTH 40
 
 
 /**

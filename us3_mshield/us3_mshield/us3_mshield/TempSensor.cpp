@@ -38,7 +38,7 @@ DHT_Unified dht(A1, DHT_TYPE);
 static temp_ctx_t context;
 
 int counter1 = 0;
-char 		payloadFinal[256];
+char 		payloadFinal[128];
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ sapi_error_t temp_read_sensor(char *payload, uint8_t *len)
 {
 	float reading = 0.0;
 	sapi_error_t rc;
-	char buffer[256];
+	char buffer[128];
 
 	// Read temp sensor, already in network order
 	rc = read_dht11(&reading);
@@ -316,8 +316,8 @@ sapi_error_t temp_build_payload(char *buf, float *reading)
 {
 	int sendInterval2 = ParamSendInterval();
 	int sampleRate2 =  ParamSampleRate();
-	char 		payload[256]; // REMEMBER!! maximum payload 118 character payload character
-	char		temp_payload[256];
+	char 		payload[128]; // REMEMBER!! maximum payload 118 character payload character
+	char		temp_payload[128];
 	char		reading_buf[32];
 	char        datatype_Ultra[] = "3,"; //datatype for LEVEL is 3
 	char		datatype_Float[] = "7,"; //datatype for DI state is 7

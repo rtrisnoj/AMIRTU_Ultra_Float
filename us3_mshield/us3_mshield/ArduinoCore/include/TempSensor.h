@@ -47,7 +47,7 @@ Networks, Inc.
 //////////////////////////////////////////////////////////////////////////
 
 // DHT11 temp sensor type
-#define TEMP_SENSOR_TYPE		"float"
+#define TEMP_SENSOR_TYPE		"US3-C-D1"
 float Send(byte * cmd, byte* ret);
 void sendCommand(byte *cmd);
 /*
